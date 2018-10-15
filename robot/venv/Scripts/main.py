@@ -12,7 +12,7 @@ arduinoBridge = ArduinoBridge()
 
 
 #set team color
-arduinoBridge.setTeamColour(0)
+arduinoBridge.setTeamColour(2)
 
 
 RobotData = RobotData(leftMotor, rightMotor, arduinoBridge)
