@@ -1,5 +1,6 @@
 from threading import Thread
 import time
+import OSC
 
 from BehaviorStates.BaseState import BaseState
 from BehaviorStates.IdleState import IdleState
@@ -36,6 +37,26 @@ class BehaviorManager:
         self.currentState = BaseState()
         self.setState("IdleState")
 
+        # setup server
+        receive_address = '192.168.0.255', 8000
+        self.server = OSC.ThreadingOSCServer(receive_address) 
+        
+        # setup handlers
+        self.server.addMsgHandler("/IdleState", self.changeStateWithOSC)
+        self.server.addMsgHandler("/BaseState", self.changeStateWithOSC)
+        self.server.addMsgHandler("/ShakenState", self.changeStateWithOSC)
+        self.server.addMsgHandler("/AngeredState", self.changeStateWithOSC)
+        self.server.addMsgHandler("/BeingPetState", self.changeStateWithOSC)
+        self.server.addMsgHandler("/ReturnToBaseState", self.changeStateWithOSC)
+        self.server.addMsgHandler("/RemoveSnowState", self.changeStateWithOSC)
+        self.server.addMsgHandler("/AttackBaseState", self.changeStateWithOSC)
+        self.server.addMsgHandler("/DriveState", self.changeStateWithOSC)
+
+        print "Serving on {}".format(self.server.server_address) 
+        self.server_thread = Thread(target=self.server.serve_forever)
+        self.server_thread.start()
+        print "done" 
+
     def start(self):
         """ Start the behavior manager in a new thread """
 
@@ -46,6 +67,13 @@ class BehaviorManager:
     def stop(self):
         """ Stop the behavior thread. This will also stop the current behavior """
         self.active = False
+
+    def changeStateWithOSC(self, addr, tags, stuff, source):
+        state_to_enter = addr[1:]
+        if state_to_enter in states.keys():
+            self.setState(state_to_enter)
+        else:
+            print "failed on state " + state_to_enter
 
 
     def setState(self, new_state_name):

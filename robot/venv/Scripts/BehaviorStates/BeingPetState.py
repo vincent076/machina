@@ -1,6 +1,7 @@
 
 from BaseState import BaseState
 import time
+from random import randint
 
 class BeingPetState(BaseState):
 
@@ -25,8 +26,10 @@ class BeingPetState(BaseState):
     def onUpdate(self, delta):
         super(BeingPetState, self).onUpdate(delta)
         print self.robotData.getLight()
-        if self.robotData.light[0] > 200 and self.robotData.light[1] > 200 and self.robotData.light[2] > 200:
-            self.beingPet = True
+         #if self.robotData.light[0] > 200 and self.robotData.light[1] > 200 and self.robotData.light[2] > 200:
+        self.beingPet = True
+        self.robotData.arduinoBridge.setTeamColour(randint(0,8))
+        self.robotData.MotorBehaviour(0,0)
         self.timer -= delta
         if self.timer <= 0:
             self.robotData.setArousal(self.robotData.arousal - 1)
